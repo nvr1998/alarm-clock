@@ -1,6 +1,7 @@
-let alarms = LS_GetAlarms();
-let totalAlarms = LS_GetTotalAlarmCount();
+let alarms = LS_GetAlarms(); // Retriving alarms from local storage // Retuns [] if there is none stored.
+let totalAlarms = LS_GetTotalAlarmCount(); // Retriving total alarms from local storage // Retuns 0 if there is none stored.
 
+// Alarm Object
 class Alarm {
   constructor(alarmID, hours, minutes, time, songID, toggled) {
     this.alarmID = alarmID;
@@ -13,6 +14,7 @@ class Alarm {
   }
 }
 
+// Loads Alarms and starts a timer once the DOM is loaded
 document.addEventListener("DOMContentLoaded", function () {
   InitialiseAlarms();
   CheckForNoAlarm();
@@ -35,12 +37,14 @@ document.addEventListener("DOMContentLoaded", function () {
   }, millisecs);
 });
 
+// Adds loaded alarms into the page
 function InitialiseAlarms() {
   for (let i = 0; i < alarms.length; i++) {
     AddAlarm(alarms[i]);
   }
 }
 
+// Suffix for the day
 function getOrdinalSuffix(day) {
   if (day > 3 && day < 21) return "th"; // handles 4th to 20th
   switch (day % 10) {
@@ -55,6 +59,7 @@ function getOrdinalSuffix(day) {
   }
 }
 
+// Adds alarm with a template-literal
 function AddAlarm(alarm) {
   const alarm_list_view = document.querySelector(".alarm-list-view");
   const alarmDOM = `<div data-alarmid=${alarm.alarmID} class="alarm-data">
@@ -75,6 +80,7 @@ function AddAlarm(alarm) {
   alarm_list_view.innerHTML += alarmDOM;
 }
 
+// Toggling the add alarm popup window
 function ToggleAlarmWindow() {
   const alarm_edit_window = document.querySelector(".alarm-popup-container");
 
@@ -82,11 +88,13 @@ function ToggleAlarmWindow() {
 
   if (alarm_edit_window.classList.contains("active")) {
     const time_input = document.getElementById("input-time");
-    console.log(GetTime());
-    time_input.value = GetTimePadstart();
+
+    let timeVal = "06:00";
+    time_input.value = timeVal;
   }
 }
 
+// Toggling the alarm to be active or not-active
 function ToggleAlarm(element) {
   element.classList.toggle("active");
   element.querySelector(".toggle-circle").classList.toggle("active");
@@ -104,6 +112,7 @@ function ToggleAlarmID(id) {
   ToggleAlarm(alarm_button);
 }
 
+// Removes alarm from the list and also from the web page
 function DeleteAlarm(element) {
   StopTimer();
   if (alarms.length > 0) {
@@ -130,8 +139,8 @@ function DeleteAlarm(element) {
   CheckForNoAlarm();
   StartTimer();
 }
-// div data-alarmId=${alarm.alarmID}
 
+// Creates a new alarm object and shows onto the web-page
 function ConfirmAlarm() {
   const time_input = document.getElementById("input-time");
   const song_input = document.getElementById("input-song");
@@ -155,6 +164,7 @@ function ConfirmAlarm() {
   ToggleAlarmWindow();
 }
 
+// Helper function to get time with correct Suffix
 function GetTimeInAMPM(timeVal) {
   let timeVals = timeVal.split(":");
   let hours = parseInt(timeVals[0]);
@@ -209,6 +219,7 @@ function formatNumber(number) {
 let checkAlarmsInterval;
 StartTimer();
 
+// This timer checks for alarms to be triggered
 function StartTimer() {
   checkAlarmsInterval = setInterval(function () {
     let now = new Date();
@@ -256,6 +267,8 @@ function StopAlarm() {
   audio_element.currentTime = 0;
 }
 
+// Local Storage Helper Functions
+
 function LS_GetAlarms() {
   if (localStorage.getItem("alarms")) {
     return JSON.parse(localStorage.getItem("alarms"));
@@ -282,6 +295,7 @@ function LS_SaveTotalAlarmCount() {
   localStorage.setItem("alarmCount", totalAlarms.toString());
 }
 
+// Checks if there are no alarms and displays a no alarm message
 function CheckForNoAlarm() {
   const noAlarmIndic = document.getElementById("no-alarms-indocator");
   if (alarms.length === 0) {
